@@ -17,6 +17,7 @@ import { Badge } from '@/components/ui/badge';
 import { Star, Search, Loader2 } from 'lucide-react';
 import useSWR from 'swr';
 import { fetcher, filterProducts, getUniqueCategories } from '@/lib/api';
+import { Product } from '@/lib/types';
 
 const API_URL = '/api/products';
 
@@ -66,10 +67,16 @@ export default function BrandPage() {
 
   const categories = getUniqueCategories(brand.products);
   const filteredProducts = filterProducts(brand.products, {
+<<<<<<< HEAD
   searchQuery,
   category: selectedCategory,
 });
 
+=======
+    searchQuery,
+    category: selectedCategory,
+  });
+>>>>>>> a4c8c92ddd208e5d9640ab591a4d7de9421fa771
 
   return (
     <div className="min-h-screen pt-16 bg-gray-50 dark:bg-gray-900">

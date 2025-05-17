@@ -19,15 +19,15 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Product, ProductFilters } from '@/lib/types';
-import { 
-  fetcher, 
-  filterProducts, 
-  getUniqueBrands, 
+import { Product, ProductFilters, ApiResponse } from '@/lib/types';
+import {
+  fetcher,
+  filterProducts,
+  getUniqueBrands,
   getUniqueProductTypes,
   getUniqueTags,
   getPriceRange,
-  getProductStats 
+  getProductStats
 } from '@/lib/api';
 import { Search, Star, AlertCircle, Filter } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -36,25 +36,28 @@ import { Badge } from "@/components/ui/badge";
 const API_URL = '/api/products';
 
 export default function SkincarePage() {
-  const { data, error, isLoading } = useSWR<Product[]>(API_URL, fetcher);
+  const { data, error, isLoading } = useSWR<ApiResponse>(API_URL, fetcher);
+
+  const products = data?.products ?? [];
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [filters, setFilters] = useState<ProductFilters>({});
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-  // Ensure data is an array before processing
-  const products = Array.isArray(data) ? data : [];
-
-  // Derived state
-  const brands = products ? getUniqueBrands(products) : [];
-  const productTypes = products ? getUniqueProductTypes(products) : [];
-  const tags = products ? getUniqueTags(products) : [];
-  const priceRange = products ? getPriceRange(products) : { min: 0, max: 100 };
-  const stats = products ? getProductStats(products) : null;
+  const brands = getUniqueBrands(products);
+  const productTypes = getUniqueProductTypes(products);
+  const tags = getUniqueTags(products);
+  const priceRange = getPriceRange(products);
+  const stats = getProductStats(products);
 
   useEffect(() => {
     if (products.length > 0) {
-      setFilteredProducts(filterProducts(products, { ...filters, searchQuery, tags: selectedTags }));
+      const result = filterProducts(products, {
+        ...filters,
+        searchQuery,
+        tags: selectedTags,
+      });
+      setFilteredProducts(result);
     }
   }, [products, filters, searchQuery, selectedTags]);
 
@@ -66,10 +69,8 @@ export default function SkincarePage() {
   ];
 
   const toggleTag = (tag: string) => {
-    setSelectedTags(prev => 
-      prev.includes(tag) 
-        ? prev.filter(t => t !== tag)
-        : [...prev, tag]
+    setSelectedTags(prev =>
+      prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
     );
   };
 
@@ -256,7 +257,7 @@ export default function SkincarePage() {
                   <div>
                     <CardTitle className="text-lg line-clamp-1">{product.name}</CardTitle>
                     <CardDescription className="line-clamp-1">
-                      {product.brand} · {product.product_type.split('_').map(word => 
+                      {product.brand} · {product.product_type.split('_').map(word =>
                         word.charAt(0).toUpperCase() + word.slice(1)
                       ).join(' ')}
                     </CardDescription>
@@ -270,7 +271,7 @@ export default function SkincarePage() {
                 <div className="flex items-center gap-1 mb-2">
                   <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                   <span className="text-sm text-gray-600 dark:text-gray-300">
-                    {product.rating || 'No rating'} 
+                    {product.rating || 'No rating'}
                   </span>
                 </div>
                 <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2 mb-4">

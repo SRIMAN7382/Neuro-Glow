@@ -13,9 +13,10 @@ import {
 } from '@/components/ui/dialog';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
+import { Session } from '@supabase/supabase-js';
 
 export default function AuthButton() {
-  const [session, setSession] = useState(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -37,7 +38,7 @@ export default function AuthButton() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline">
-          {session ? 'Account' : 'Sign In'}
+          {session ? 'Sign Out' : 'Sign In'}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
@@ -52,18 +53,16 @@ export default function AuthButton() {
             supabaseClient={supabase}
             appearance={{ theme: ThemeSupa }}
             providers={[]}
-            theme="dark"
           />
         ) : (
-          <div className="flex flex-col gap-4">
-            <p>Signed in as {session.user.email}</p>
-            <Button
-              variant="destructive"
-              onClick={() => supabase.auth.signOut()}
-            >
-              Sign Out
-            </Button>
-          </div>
+          <Button
+            onClick={async () => {
+              await supabase.auth.signOut();
+              setSession(null);
+            }}
+          >
+            Sign Out
+          </Button>
         )}
       </DialogContent>
     </Dialog>
