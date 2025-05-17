@@ -1,6 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
   images: { 
     unoptimized: true,
     remotePatterns: [
@@ -18,7 +17,7 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   experimental: {
-    serverActions: true, // ✅ must be a boolean, not an object
+    serverActions: true
   }
 };
 
