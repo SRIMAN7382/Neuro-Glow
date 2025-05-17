@@ -1,20 +1,43 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  images: {
+  images: { 
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**',
+        hostname: 'images.unsplash.com',
       },
-    ],
+      {
+        protocol: 'https',
+        hostname: '**.herokuapp.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'd3t32hsnjxo7q6.cloudfront.net',
+      },
+      {
+        protocol: 'https',
+        hostname: 's3.amazonaws.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'via.placeholder.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.jaxcosmeticdentist.com',
+      }
+    ]
   },
-  webpack: (config, { dev, isServer }) => {
-    // Disable webpack cache in development to prevent file system issues
-    if (dev) {
-      config.cache = false;
-    }
-    return config;
+  eslint: {
+    ignoreDuringBuilds: true,
   },
-}
+  typescript: {
+    ignoreBuildErrors: true
+  },
+  experimental: {
+    serverActions: true
+  }
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;

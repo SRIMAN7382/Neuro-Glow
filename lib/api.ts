@@ -1,4 +1,4 @@
-import { Product, Brand, ApiResponse, ProductFilters } from './types';
+import { Product, Brand, ApiResponse } from './types';
 
 export async function fetcher(url: string): Promise<ApiResponse> {
   const response = await fetch(url);
@@ -55,7 +55,15 @@ export function getPriceRange(products: Product[]): { min: number; max: number }
 
 export function filterProducts(
   products: Product[],
-  filters: ProductFilters = {}
+  filters: {
+    brand?: string;
+    category?: string;
+    product_type?: string;
+    searchQuery?: string;
+    tags?: string[];
+    minPrice?: number;
+    maxPrice?: number;
+  } = {}
 ): Product[] {
   return products.filter(product => {
     // Brand filter
@@ -101,6 +109,32 @@ export function filterProducts(
 
     return true;
   });
+}
+
+export function groupProductsByBrand(products: Product[]): Record<string, Brand> {
+  return products.reduce((acc, product) => {
+    const brandName = product.brand;
+    const brandSlug = brandName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    
+    if (!acc[brandSlug]) {
+      acc[brandSlug] = {
+        name: brandName,
+        slug: brandSlug,
+        productCount: 0,
+        categories: new Set(),
+        productTypes: new Set(),
+        image: product.image_link,
+        products: []
+      };
+    }
+    
+    acc[brandSlug].productCount++;
+    acc[brandSlug].categories.add(product.category);
+    acc[brandSlug].productTypes.add(product.product_type);
+    acc[brandSlug].products.push(product);
+    
+    return acc;
+  }, {} as Record<string, Brand>);
 }
 
 export function getProductStats(products: Product[]) {
