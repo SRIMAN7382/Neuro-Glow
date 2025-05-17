@@ -23,7 +23,6 @@ import {
   TrendingUp,
   Package,
   Sparkles,
-  Award,
 } from 'lucide-react';
 import {
   Select,
@@ -33,6 +32,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { fetcher } from '@/lib/api';
+import { Brand, Product } from '@/lib/types';
 
 const API_URL = '/api/products';
 
@@ -54,16 +54,9 @@ export default function BrandsPage() {
     { value: 'name', label: 'Alphabetical' },
   ];
 
-  // Filter and sort brands
-  const filteredBrands = data?.brands?.filter(brand => {
-    const matchesSearch = !searchQuery || 
-      brand.name.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesCategory = !selectedCategory || 
-      Array.from(brand.categories).some(cat => 
-        cat.toLowerCase() === selectedCategory.toLowerCase()
-      );
-
+  const filteredBrands: Brand[] = data?.brands?.filter((brand: Brand) => {
+    const matchesSearch = !searchQuery || brand.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = !selectedCategory || Array.from(brand.categories).some(cat => cat.toLowerCase() === selectedCategory.toLowerCase());
     return matchesSearch && matchesCategory;
   }).sort((a, b) => {
     switch (sortBy) {
@@ -75,16 +68,18 @@ export default function BrandsPage() {
         return bRating - aRating;
       case 'name':
         return a.name.localeCompare(b.name);
-      default: // 'popular'
+      default:
         return b.productCount - a.productCount;
     }
   }) || [];
 
-  const categories = data?.categories || [];
+  const categories: string[] = data?.categories || [];
   const stats = data ? {
     totalBrands: data.brands.length,
     totalProducts: data.products.length,
-    averageRating: data.products.reduce((sum, p) => sum + (p.rating || 0), 0) / data.products.length,
+    averageRating: data.products.length > 0
+      ? data.products.reduce((sum: number, p: Product) => sum + (p.rating || 0), 0) / data.products.length
+      : 0,
     categories: categories.length
   } : null;
 
@@ -92,13 +87,11 @@ export default function BrandsPage() {
     setImageLoadError(prev => ({ ...prev, [brandSlug]: true }));
   };
 
-  const getBrandImage = (brand: any) => {
-    if (imageLoadError[brand.slug]) {
-      return FALLBACK_IMAGE;
-    }
-    
-    // Find the first valid product image
-    const validImage = brand.products.find(p => p.image_link && p.image_link.startsWith('http'))?.image_link;
+  const getBrandImage = (brand: Brand) => {
+    if (imageLoadError[brand.slug]) return FALLBACK_IMAGE;
+    const validImage = brand.products.find((p: Product) =>
+      p.image_link && p.image_link.startsWith('http')
+    )?.image_link;
     return validImage || FALLBACK_IMAGE;
   };
 
@@ -171,7 +164,7 @@ export default function BrandsPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               <Card>
-                <CardHeader className="space-y-1">
+                <CardHeader>
                   <CardTitle className="text-2xl font-bold">{stats.totalBrands}</CardTitle>
                   <CardDescription className="flex items-center gap-2">
                     <Package className="h-4 w-4 text-pink-500" />
@@ -180,7 +173,7 @@ export default function BrandsPage() {
                 </CardHeader>
               </Card>
               <Card>
-                <CardHeader className="space-y-1">
+                <CardHeader>
                   <CardTitle className="text-2xl font-bold">{stats.totalProducts}</CardTitle>
                   <CardDescription className="flex items-center gap-2">
                     <Sparkles className="h-4 w-4 text-pink-500" />
@@ -189,7 +182,7 @@ export default function BrandsPage() {
                 </CardHeader>
               </Card>
               <Card>
-                <CardHeader className="space-y-1">
+                <CardHeader>
                   <CardTitle className="text-2xl font-bold">{stats.averageRating.toFixed(1)}</CardTitle>
                   <CardDescription className="flex items-center gap-2">
                     <Star className="h-4 w-4 text-pink-500" />
@@ -198,7 +191,7 @@ export default function BrandsPage() {
                 </CardHeader>
               </Card>
               <Card>
-                <CardHeader className="space-y-1">
+                <CardHeader>
                   <CardTitle className="text-2xl font-bold">{stats.categories}</CardTitle>
                   <CardDescription className="flex items-center gap-2">
                     <TrendingUp className="h-4 w-4 text-pink-500" />
@@ -266,7 +259,7 @@ export default function BrandsPage() {
                           <Badge variant="secondary" className="bg-white/20 text-white">
                             {brand.productCount} Products
                           </Badge>
-                          {brand.products.some(p => parseFloat(p.price) > 25) && (
+                          {brand.products.some((p: Product) => parseFloat(p.price) > 25) && (
                             <Badge variant="secondary" className="bg-white/20 text-white">
                               Free Shipping
                             </Badge>
@@ -288,7 +281,6 @@ export default function BrandsPage() {
                           {Array.from(brand.categories).length} Categories
                         </div>
                       </div>
-
                       <div className="flex flex-wrap gap-2">
                         {Array.from(brand.productTypes).slice(0, 3).map((type, index) => (
                           <Badge key={index} variant="outline" className="capitalize">
@@ -296,7 +288,6 @@ export default function BrandsPage() {
                           </Badge>
                         ))}
                       </div>
-
                       <Button 
                         className="w-full bg-pink-500 hover:bg-pink-600 text-white"
                         onClick={() => router.push(`/brands/${brand.slug}`)}
@@ -307,50 +298,6 @@ export default function BrandsPage() {
                     </div>
                   </CardContent>
                 </Card>
-
-                {/* Hover Preview */}
-                {hoveredBrand === brand.slug && brand.products.length > 0 && (
-                  <div className="absolute left-full ml-4 top-0 z-50 hidden lg:block">
-                    <Card className="w-[300px] shadow-xl">
-                      <CardHeader>
-                        <CardTitle className="text-lg">Featured Products</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        {brand.products.slice(0, 3).map((product) => (
-                          <div key={product.id} className="flex gap-3">
-                            <div className="relative w-16 h-16 flex-shrink-0">
-                              <Image
-                                src={product.image_link}
-                                alt={product.name}
-                                fill
-                                className="object-contain"
-                                onError={(e) => {
-                                  const target = e.target as HTMLImageElement;
-                                  target.src = FALLBACK_IMAGE;
-                                }}
-                                sizes="64px"
-                              />
-                            </div>
-                            <div className="flex-1">
-                              <h5 className="text-sm font-medium line-clamp-1">
-                                {product.name}
-                              </h5>
-                              <div className="flex items-center gap-1 mt-1">
-                                <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                                <span className="text-xs text-gray-600 dark:text-gray-400">
-                                  {product.rating || 'No rating'}
-                                </span>
-                              </div>
-                              <span className="text-sm font-medium text-pink-500">
-                                {product.price_sign}{parseFloat(product.price).toFixed(2)}
-                              </span>
-                            </div>
-                          </div>
-                        ))}
-                      </CardContent>
-                    </Card>
-                  </div>
-                )}
               </div>
             ))}
           </div>
