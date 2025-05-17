@@ -16,6 +16,9 @@ const nextConfig = {
   },
   eslint: {
     ignoreDuringBuilds: true,
+  },
+  experimental: {
+    serverActions: true, // ✅ must be a boolean, not an object
   }
 };
 
