@@ -33,3 +33,38 @@ export default function AuthButton() {
 
     return () => subscription.unsubscribe(); // ✅ correct cleanup
   }, []);
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline">
+          {session ? 'Sign Out' : 'Sign In'}
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Authentication</DialogTitle>
+          <DialogDescription>
+            Sign in to your account or create a new one
+          </DialogDescription>
+        </DialogHeader>
+        {!session ? (
+          <Auth
+            supabaseClient={supabase}
+            appearance={{ theme: ThemeSupa }}
+            providers={[]}
+          />
+        ) : (
+          <Button
+            onClick={async () => {
+              await supabase.auth.signOut();
+              setSession(null);
+            }}
+          >
+            Sign Out
+          </Button>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
