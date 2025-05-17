@@ -45,3 +45,15 @@ export interface ApiResponse {
   error?: boolean;
   message?: string;
 }
+
+// ✅ Add this block at the bottom
+export interface ProductFilters {
+  brand?: string;
+  category?: string;
+  product_type?: string;
+  searchQuery?: string;
+  tags?: string[];
+  minPrice?: number;
+  maxPrice?: number;
+  sortBy?: 'price_asc' | 'price_desc' | 'rating' | 'name';
+}
