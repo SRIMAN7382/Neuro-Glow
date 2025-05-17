@@ -65,7 +65,11 @@ export default function BrandPage() {
   }
 
   const categories = getUniqueCategories(brand.products);
-  const filteredProducts = filterProducts(brand.products, searchQuery, selectedCategory);
+  const filteredProducts = filterProducts(brand.products, {
+  searchQuery,
+  category: selectedCategory,
+});
+
 
   return (
     <div className="min-h-screen pt-16 bg-gray-50 dark:bg-gray-900">
