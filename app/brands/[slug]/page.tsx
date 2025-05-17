@@ -67,10 +67,10 @@ export default function BrandPage() {
 
   const categories = getUniqueCategories(brand.products);
   const filteredProducts = filterProducts(brand.products, {
-<<<<<<< HEAD
   searchQuery,
   category: selectedCategory,
 });
+
 
 =======
     searchQuery,
