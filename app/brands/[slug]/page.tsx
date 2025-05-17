@@ -25,7 +25,7 @@ export default function BrandPage() {
   const params = useParams();
   const { data, error, isLoading } = useSWR(API_URL, fetcher);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
 
   if (isLoading) {
     return (
@@ -67,9 +67,10 @@ export default function BrandPage() {
 
   const categories = getUniqueCategories(brand.products);
   const filteredProducts = filterProducts(brand.products, {
-  searchQuery,
-  category: selectedCategory,
-});
+    searchQuery,
+    category: selectedCategory === 'all' ? '' : selectedCategory,
+  });
+
   return (
     <div className="min-h-screen pt-16 bg-gray-50 dark:bg-gray-900">
       {/* Hero Section */}
@@ -106,7 +107,7 @@ export default function BrandPage() {
               <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Categories</SelectItem>
+              <SelectItem value="all">All Categories</SelectItem>
               {categories.map((category) => (
                 <SelectItem key={category} value={category}>
                   {category}
