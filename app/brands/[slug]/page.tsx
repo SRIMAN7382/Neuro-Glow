@@ -70,14 +70,6 @@ export default function BrandPage() {
   searchQuery,
   category: selectedCategory,
 });
-
-
-=======
-    searchQuery,
-    category: selectedCategory,
-  });
->>>>>>> a4c8c92ddd208e5d9640ab591a4d7de9421fa771
-
   return (
     <div className="min-h-screen pt-16 bg-gray-50 dark:bg-gray-900">
       {/* Hero Section */}
