@@ -29,7 +29,6 @@ export default function RootLayout({
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
-          suppressHydrationWarning
         >
           <Navigation />
           <main>{children}</main>
