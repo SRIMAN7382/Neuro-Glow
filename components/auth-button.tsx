@@ -13,23 +13,23 @@ import {
 } from '@/components/ui/dialog';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
-import { Session } from '@supabase/supabase-js'; // ✅ import this
+import { Session } from '@supabase/supabase-js';
 
 export default function AuthButton() {
-  const [session, setSession] = useState<Session | null>(null); // ✅ typed correctly
+  const [session, setSession] = useState<Session | null>(null);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-  supabase.auth.getSession().then(({ data: { session } }) => {
-    setSession(session);
-  });
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
 
-  const {
-    data: { subscription },
-  } = supabase.auth.onAuthStateChange((_event, session) => {
-    setSession(session);
-    if (session) setOpen(false);
-  });
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      if (session) setOpen(false);
+    });
 
-  return () => subscription.unsubscribe(); // ✅ return cleanup
-}, []);
+    return () => subscription.unsubscribe(); // ✅ correct cleanup
+  }, []);
