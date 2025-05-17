@@ -46,7 +46,6 @@ export interface ApiResponse {
   message?: string;
 }
 
-// ✅ Add this block at the bottom
 export interface ProductFilters {
   brand?: string;
   category?: string;
