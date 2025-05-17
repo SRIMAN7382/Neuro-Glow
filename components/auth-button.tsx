@@ -31,7 +31,7 @@ export default function AuthButton() {
       if (session) setOpen(false);
     });
 
-    return () => subscription.unsubscribe(); // ✅ correct cleanup
+    return () => subscription.unsubscribe();
   }, []);
 
   return (
